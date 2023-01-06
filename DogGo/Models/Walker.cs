@@ -1,4 +1,6 @@
-﻿namespace DogGo.Models
+﻿using System.Collections.Generic;
+
+namespace DogGo.Models
 {
     public class Walker
     {

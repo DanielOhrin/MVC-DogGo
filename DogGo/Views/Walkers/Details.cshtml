@@ -1,39 +1,60 @@
-﻿@model DogGo.Models.Walker
+﻿@model DogGo.Models.ViewModels.WalkerProfileViewModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Walker Profile";
 }
 
-<h1>Details</h1>
+<h1>Walker Profile</h1>
 
-<div>
-    <h4>Walker</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Id)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Neighborhood)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Neighborhood.Name)
-        </dd>
-        <dd class = "col-sm-2">
-            <img class="bg-info" src="@Model.ImageUrl" alt="avatar" />
-        </dd>
-    </dl>
-</div>
-<div>
-    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
-    <a asp-action="Index">Back to List</a>
-</div>
+<section class="d-flex flex-nowrap">
+    <div>
+        <img src="@Model.Walker.ImageUrl" alt="avatar" width="200" height="200"/>
+    </div>
+    <div class="align-self-center">
+        <table id="walker-details__table">
+            <tbody>
+                <tr>
+                    <td>@Html.DisplayNameFor(model => model.Walker.Name):&emsp;</td> <!-- Wanted to get used to using these commands -->
+                    <td>@Html.DisplayFor(model => model.Walker.Name)</td>
+                </tr>
+                <tr>
+                    <td>Neighborhood:&emsp;</td>
+                    <td>@Html.DisplayFor(model => model.Walker.Neighborhood.Name)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="align-self-end">
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Walker.Id }) |
+        <a asp-action="Index">Back to List</a>
+    </div>
+</section>
+<section class="d-flex pt-5 mt-5 bg-white">
+    <article class="w-75 m-auto pl-5">
+        <h1>Recent Walks</h1> 
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.Walks[0].Date)</th>
+                    <th>Client Name</th>
+                    <th>@Html.DisplayNameFor(model => model.Walks[0].Duration)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Walk walk in Model.Walks)
+                {
+                    <tr>
+                        <td>@walk.Date</td>
+                        <td>@walk.Dog.Owner.Name</td>
+                        <td>@walk.MinuteString</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        @Html.ActionLink("Add Walk(s)", "Create", "Walk")
+    </article>
+    <aside class="d-flex pl-5 pr-5 text-nowrap">
+        <h2 class="text-black-50">Total Walk Time: </h2>
+        <h2 class="font-weight-bold ml-3 align-self-auto">@Model.TotalWalkTime</h2>
+    </aside>
+</section>
