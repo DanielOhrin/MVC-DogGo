@@ -11,52 +11,46 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DogGo.Controllers
 {
-    public class WalkersController : Controller
+    public class WalkController : Controller
     {
         private readonly IWalkerRepository _walkerRepo;
         private readonly IWalkRepository _walkRepo;
+        private readonly IDogRepository _dogRepo;
         // ASP.NET will give us an instance of our Walker Repository. This is called "Dependency Injection"
-        public WalkersController(IWalkerRepository walkerRepository, IWalkRepository walkRepository)
+        public WalkController(IWalkerRepository walkerRepository, IWalkRepository walkRepository, IDogRepository dogRepo)
         {
             _walkerRepo = walkerRepository;
             _walkRepo = walkRepository;
+            _dogRepo = dogRepo;
         }
+        
+        //TODO: Learn more about IFormCollection and asp-for. Fix bug when Submitting form in Create.cshtml (this controller)
 
         // GET: WalkersController
         public ActionResult Index()
         {
-            List<Walker> walkers = _walkerRepo.GetAllWalkers();
-            return View(walkers);
+            return View();
         }
 
         // GET: WalkersController/Details/5
         public ActionResult Details(int id)
         {
-            Walker walker = _walkerRepo.GetWalkerById(id);
-            List<Walk> walks = _walkRepo.GetWalksByWalkerId(id);
-
-            if (walker == null)
-            {
-                return NotFound();
-            }
-
-            //! Business logic for TotalWalkTime
-            string timeString = TimeSpan.FromSeconds(walks.Sum(x => x.Duration)).ToString(@"hh'hr, 'mm'min'");
-
-            WalkerProfileViewModel vm = new()
-            {
-                Walker = walker,
-                Walks = walks,
-                TotalWalkTime = timeString
-            };
-
-            return View(vm);
+            return View();
         }
 
         // GET: WalkersController/Create
         public ActionResult Create()
         {
-            return View();
+            List<Dog> dogs = _dogRepo.GetAllDogs();
+            List<Walker> walkers = _walkerRepo.GetAllWalkers();
+
+            CreateWalkViewModel vm = new()
+            {
+                Dogs = dogs,
+                Walkers = walkers
+            };
+
+            return View(vm);
         }
 
         // POST: WalkersController/Create
@@ -66,7 +60,22 @@ namespace DogGo.Controllers
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                List<int> dogIds = collection["DogIds"].Select(x => Convert.ToInt32(x)).ToList();
+
+                foreach(int dogId in dogIds)
+                {
+                    Walk walk = new()
+                    {
+                        WalkerId = int.Parse(collection["Walk.WalkerId"]),
+                        Date = DateTime.Parse(collection["Walker.Date"]),
+                        Duration = int.Parse(collection["Walker.Duration"]),
+                        DogId = dogId
+                    };
+
+                    _walkRepo.CreateWalk(walk);
+                }
+
+                return RedirectToAction(nameof(Index), "Walkers");
             }
             catch
             {

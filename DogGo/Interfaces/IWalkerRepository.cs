@@ -9,5 +9,6 @@ namespace DogGo.Interfaces
         List<Walker> GetAllWalkers();
         Walker GetWalkerById(int id);
         List<Walker> GetWalkersInNeighborhood(int neighborhoodId);
+
     }
 }
